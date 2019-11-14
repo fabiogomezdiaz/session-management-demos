@@ -1,0 +1,57 @@
+---
+# Route
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: "node-redis"
+  labels:
+    app: "node-redis"
+spec:
+  to:
+    kind: Service
+    name: "node-redis"
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: "node-redis"
+  labels:
+    app: "node-redis"
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: "node-redis"
+---
+# Deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-redis
+  labels:
+    app: "node-redis"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "node-redis"
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: "node-redis"
+        image: "fabiogomezdiaz/node-redis:latest"
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: REDIS_HOST
+          value: "redis-master"
+        - name: REDIS_PORT
+          value: "6379"
