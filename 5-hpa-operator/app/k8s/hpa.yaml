@@ -1,0 +1,36 @@
+---
+# HPA CPU
+#apiVersion: autoscaling/v2beta1
+#kind: HorizontalPodAutoscaler
+#metadata:
+#  name: shopping-matrix-cpu 
+#spec:
+#  scaleTargetRef:
+#    apiVersion: apps.openshift.io/v1 
+#    kind: ReplicationController 
+#    name: shopping-matrix 
+#  minReplicas: 1 
+#  maxReplicas: 10 
+#  metrics:
+#  - type: Resource
+#    resource:
+#      name: cpu
+#      targetAverageUtilization: 50
+---
+# HPA Memory
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: shopping-matrix
+spec:
+  maxReplicas: 3
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: shopping-matrix
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 50

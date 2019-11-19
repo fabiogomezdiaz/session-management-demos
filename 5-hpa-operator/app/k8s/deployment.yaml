@@ -9,6 +9,7 @@ metadata:
 data:
   application.properties: |-
     sessions.maxSessions=20
+    management.endpoints.web.exposure.include=health,info,metrics
 ---
 # Deployment
 apiVersion: extensions/v1beta1
@@ -53,13 +54,49 @@ spec:
           httpGet:
             path: /actuator/health
             port: 8080
-          initialDelaySeconds: 3
+          initialDelaySeconds: 25 #3
           periodSeconds: 2
           failureThreshold: 3
         livenessProbe:
           httpGet:
             path: /actuator/health
             port: 8080
-          initialDelaySeconds: 5
+          initialDelaySeconds: 30 #5
           periodSeconds: 5
           failureThreshold: 3
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: "500m"
+          requests:
+            memory: 120Mi
+            cpu: "250m"
+---
+# Route
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: "shopping-matrix"
+  labels:
+    app: "shopping-matrix"
+spec:
+  to:
+    kind: Service
+    name: "shopping-matrix"
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: "shopping-matrix"
+  labels:
+    app: "shopping-matrix"
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: "shopping-matrix"
