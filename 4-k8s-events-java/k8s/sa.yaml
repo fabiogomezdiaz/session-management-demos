@@ -1,0 +1,26 @@
+---
+# Role
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-reader
+rules:
+  - apiGroups: ["extensions", "apps"]
+    resources: ["deployments", "configmaps", "pods", "services", "endpoints", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+# Role Binding
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-reader-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: myproject
+#- kind: User
+#  name: system:anonymous
+roleRef:
+  kind: ClusterRole
+  name: namespace-reader
+  apiGroup: rbac.authorization.k8s.io
